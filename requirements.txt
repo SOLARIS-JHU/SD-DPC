@@ -1,0 +1,13 @@
+# Direct dependencies used by the SparseDPC framework, scripts, and notebooks.
+# Neuromancer version matches the paper; other versions reflect the tested environment.
+neuromancer==1.5.3
+torch==2.6.0
+numpy==1.26.4
+matplotlib==3.9.3
+pandas==1.5.3
+PyYAML==6.0.2
+casadi==3.6.7
+seaborn==0.13.2
+ipython==8.27.0
+jupyterlab==4.3.4
+pytest==8.4.2

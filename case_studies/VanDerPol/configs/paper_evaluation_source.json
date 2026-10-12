@@ -1,0 +1,103 @@
+{
+  "seed": 0,
+  "policy_seed": 6,
+  "action_scale": 1.0,
+  "action_gradient_mode": "leaky_straight_through",
+  "action_gradient_band": 0.05,
+  "action_gradient_leak": 0.01,
+  "nsteps": 50,
+  "n_samples": 1000,
+  "batch_size": 200,
+  "eval_seed": 0,
+  "eval_margin": 0.1,
+  "xmin_data": -4.0,
+  "xmax_data": 4.0,
+  "lr": 0.005,
+  "grad_clip": 5.0,
+  "proximal_l1": true,
+  "epochs": 3999,
+  "threshold": 0.25,
+  "prune_every": 400,
+  "max_unchange": 0,
+  "prune_every_min": 300,
+  "prune_every_decay": 200,
+  "change_prune_every": true,
+  "threshold_mult": 1.17,
+  "threshold_max": 0.5,
+  "prune_noise": 0.02,
+  "lr_decay_enabled": true,
+  "lr_decay_gamma": 0.95,
+  "lr_decay_step": 50,
+  "l1_decay": 0.9,
+  "warmup": 200,
+  "patience": 50,
+  "verbosity": 10,
+  "logger_metrics": [
+    "train_loss",
+    "dev_loss",
+    "train_tracking_loss",
+    "dev_tracking_loss",
+    "train_l1_loss",
+    "dev_l1_loss",
+    "train_constraint_loss",
+    "dev_constraint_loss",
+    "learning_rate",
+    "unchanged_prune_count"
+  ],
+  "weights": {
+    "Q_r": 20.0,
+    "Q_u": 5.0,
+    "Q_dx": 0.0,
+    "Q_du": 1.0,
+    "Q_con": 20.0,
+    "l1_coef": 0.008,
+    "Q_con_x": 20.0
+  },
+  "n_seeds": 20,
+  "eval_nsteps": 300,
+  "evaluation_plant": "nominal",
+  "x0_min": -4.0,
+  "x0_max": 4.0,
+  "ref_target": [
+    0.0,
+    0.0
+  ],
+  "safe_xmin": -5.0,
+  "safe_xmax": 5.0,
+  "methods": [
+    "mpc",
+    "sd_dpc",
+    "nn_dpc"
+  ],
+  "nn_policy": {
+    "layers": [
+      32,
+      32
+    ],
+    "activation": "gelu"
+  },
+  "reach_tolerance": 0.05,
+  "reach_hold_steps": 5,
+  "inference_benchmark": {
+    "warmup": 10,
+    "repeats": 200,
+    "iters": 1000,
+    "batch_size": 1,
+    "seed": 0,
+    "compiled": true
+  },
+  "mpc": {
+    "mode": "dpc_open_loop",
+    "integration_method": "rk4",
+    "match_dpc_constraints": true,
+    "terminal_tol": 0.01,
+    "enforce_state_bounds": false,
+    "enforce_safety_constraints": false,
+    "warm_start": true,
+    "max_iter": 1000,
+    "tol": 1e-06,
+    "acceptable_tol": 0.0001,
+    "acceptable_iter": 15,
+    "print_level": 0
+  }
+}

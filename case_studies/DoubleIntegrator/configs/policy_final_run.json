@@ -1,0 +1,81 @@
+{
+  "example": "double_integrator",
+  "run_id": "double_integrator_final",
+  "source_run": "double_integrator_thr_pow_m1_09",
+  "dynamics_checkpoint": "assets/dynamics/double_integrator_sindy.pt",
+  "output_dir": "results/double_integrator/double_integrator_final",
+  "expected_final_terms_per_output": [
+    8,
+    4
+  ],
+  "debias": {
+    "enabled": true,
+    "stable_pruning_stages": 3,
+    "epochs": 800,
+    "learning_rate": "initial_training_rate",
+    "require_plateau": true
+  },
+  "training": {
+    "action_gradient_band": 0.01,
+    "action_gradient_leak": 0.05,
+    "action_gradient_mode": "leaky_straight_through",
+    "action_scale": 1.0,
+    "batch_size": 200,
+    "change_prune_every": false,
+    "ellipse": {
+      "b": 1,
+      "c": 0.0,
+      "d": 0.0,
+      "p": 3,
+      "theta": 0.0
+    },
+    "epochs": 12000,
+    "eval_margin": 0.1,
+    "eval_seed": 0,
+    "grad_clip": 1.0,
+    "init_center": [
+      3,
+      -3
+    ],
+    "init_scale": 0.01,
+    "init_side": 2.0,
+    "l1_decay": 1.0,
+    "lr": 0.0005,
+    "lr_decay_enabled": true,
+    "lr_decay_gamma": 0.99,
+    "lr_decay_step": 100,
+    "max_unchange": 3,
+    "n_samples": 2000,
+    "nsteps": 100,
+    "patience": 50,
+    "policy_seed": 5,
+    "proximal_l1": false,
+    "prune_every": 800,
+    "prune_every_decay": 0,
+    "prune_every_min": 800,
+    "prune_noise": 0.0,
+    "ref_center": [
+      -3,
+      3
+    ],
+    "ref_side": 2.0,
+    "refstep": 1,
+    "seed": 0,
+    "threshold": 0.004,
+    "threshold_max": 0.004,
+    "threshold_mult": 1.0,
+    "verbosity": 10,
+    "warmup": 100,
+    "weights": {
+      "Q_con_obs": 100.0,
+      "Q_con_u": 1.0,
+      "Q_con_x": 1.0,
+      "Q_du": 10.0,
+      "Q_dx": 1.0,
+      "Q_r": 1.0,
+      "Q_u": 10.0,
+      "Q_uf": 5.0,
+      "l1_coef": 0.016
+    }
+  }
+}

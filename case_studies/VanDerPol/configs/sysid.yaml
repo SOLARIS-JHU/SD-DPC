@@ -1,0 +1,22 @@
+# Paper Table I. Stage 1 - SINDy identification of the conventional one-input Van der Pol system.
+seed: 0
+nsim: 2000
+nsteps: 3
+bs: 2000
+weight_decay: 0.01
+lr: 1.0e-3
+epochs: 6000
+warmup: 300
+patience: 50
+threshold: 0.01
+prune_every: 1000
+threshold_mult: 1.00
+prune_noise: 0.0
+l1_decay: 1.0
+verbosity: 10
+weights: {onestep_coef: 1.0, ref_coef: 2.0, l1_coef: 1.0e-5}
+# Algorithm 1: refit coefficients on the selected support without the L1 penalty.
+debias:
+  enabled: true
+  epochs: 1000
+  learning_rate: initial_training_rate

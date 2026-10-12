@@ -1,0 +1,9 @@
+# NN-DPC uses the exact SD-DPC data, horizon, objective, constraints, and coefficients.
+inherit: policy.yaml
+policy_type: nn
+layers: [32, 32]
+activation: relu
+lr: 0.005
+epochs: 1000
+warmup: 100
+patience: 50

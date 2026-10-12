@@ -1,0 +1,128 @@
+{
+  "seed": 0,
+  "policy_seed": 5,
+  "init_scale": 0.01,
+  "action_scale": 1.0,
+  "action_gradient_mode": "leaky_straight_through",
+  "action_gradient_band": 0.01,
+  "action_gradient_leak": 0.05,
+  "nsteps": 100,
+  "n_samples": 2000,
+  "batch_size": 200,
+  "eval_seed": 0,
+  "eval_margin": 0.1,
+  "init_center": [
+    3,
+    -3
+  ],
+  "init_side": 2.0,
+  "ref_center": [
+    -3,
+    3
+  ],
+  "ref_side": 2.0,
+  "refstep": 1,
+  "ellipse": {
+    "p": 3,
+    "b": 1,
+    "c": 0.0,
+    "d": 0.0,
+    "theta": 0.0
+  },
+  "lr": 0.0015,
+  "grad_clip": 10.0,
+  "proximal_l1": false,
+  "epochs": 6000,
+  "threshold": 0.001,
+  "prune_every": 500,
+  "max_unchange": 3,
+  "prune_every_min": 500,
+  "prune_every_decay": 50,
+  "change_prune_every": true,
+  "threshold_mult": 2.0,
+  "threshold_max": 0.008,
+  "prune_noise": 0.0,
+  "lr_decay_enabled": true,
+  "lr_decay_gamma": 0.99,
+  "lr_decay_step": 100,
+  "l1_decay": 1.0,
+  "warmup": 100,
+  "patience": 50,
+  "verbosity": 10,
+  "logger_metrics": [
+    "train_loss",
+    "dev_loss",
+    "train_tracking_loss",
+    "dev_tracking_loss",
+    "train_l1_loss",
+    "dev_l1_loss",
+    "train_constraint_loss",
+    "dev_constraint_loss",
+    "train_total_control_action_l1",
+    "dev_total_control_action_l1",
+    "learning_rate",
+    "unchanged_prune_count"
+  ],
+  "weights": {
+    "Q_r": 1.0,
+    "Q_u": 10.0,
+    "Q_uf": 5.0,
+    "Q_dx": 1.0,
+    "Q_du": 10.0,
+    "Q_con_obs": 100.0,
+    "Q_con_x": 1.0,
+    "Q_con_u": 1.0,
+    "l1_coef": 0.0005,
+    "Q_con_du": 1.0
+  },
+  "n_seeds": 50,
+  "eval_nsteps": 100,
+  "evaluation_plant": "nominal",
+  "bands": {
+    "obstacle": 0.5,
+    "box": 0.5,
+    "du": 0.01
+  },
+  "du_max": 0.2,
+  "reach_tolerance": 0.05,
+  "reach_hold_steps": 5,
+  "methods": [
+    "mpc",
+    "sd_dpc",
+    "nn_dpc"
+  ],
+  "nn_policy": {
+    "layers": [
+      32,
+      32
+    ],
+    "activation": "gelu"
+  },
+  "inference_benchmark": {
+    "warmup": 10,
+    "repeats": 200,
+    "iters": 1000,
+    "batch_size": 1,
+    "seed": 0,
+    "compiled": true
+  },
+  "mpc": {
+    "mode": "dpc_open_loop",
+    "integration_method": "euler",
+    "match_dpc_constraints": true,
+    "enforce_state_bounds": true,
+    "enforce_safety_constraints": true,
+    "enforce_control_rate_constraints": true,
+    "enforce_terminal_reference": true,
+    "terminal_reference_tolerance": 0.0,
+    "constraint_margin": 0.0001,
+    "state_bound_margin": 0.0001,
+    "control_rate_margin": 1e-05,
+    "warm_start": true,
+    "max_iter": 3000,
+    "tol": 1e-08,
+    "acceptable_tol": 1e-07,
+    "acceptable_iter": 10,
+    "print_level": 0
+  }
+}

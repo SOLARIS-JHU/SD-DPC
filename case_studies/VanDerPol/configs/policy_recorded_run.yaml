@@ -1,0 +1,63 @@
+# Settings recorded for the included final checkpoint; see policy_final_run.json.
+# Sparse training selected for the final paper run.
+# Source: gpt_SparseDPC/Latest_SparseDPC_Final_Runs/configs/vanderpol_final.json
+seed: 0
+policy_seed: 6
+action_scale: 1.0
+action_gradient_mode: leaky_straight_through
+action_gradient_band: 0.05
+action_gradient_leak: 0.01
+nsteps: 50
+n_samples: 1000
+batch_size: 200
+eval_seed: 0
+eval_margin: 0.1
+xmin_data: -4.0
+xmax_data: 4.0
+lr: 0.0015
+grad_clip: 10.0
+proximal_l1: true
+epochs: 12000
+threshold: 0.0625
+prune_every: 800
+max_unchange: 3
+prune_every_min: 800
+prune_every_decay: 0
+change_prune_every: false
+threshold_mult: 1.0
+threshold_max: 0.0625
+prune_noise: 0.02
+lr_decay_enabled: true
+lr_decay_gamma: 0.95
+lr_decay_step: 50
+l1_decay: 0.9
+warmup: 200
+patience: 50
+verbosity: 10
+logger_metrics:
+- train_loss
+- dev_loss
+- train_tracking_loss
+- dev_tracking_loss
+- train_l1_loss
+- dev_l1_loss
+- train_constraint_loss
+- dev_constraint_loss
+- learning_rate
+- unchanged_prune_count
+weights:
+  Q_con: 20.0
+  Q_du: 1.0
+  Q_dx: 0.0
+  Q_r: 20.0
+  Q_u: 5.0
+  l1_coef: 0.001
+debias:
+  enabled: true
+  stable_pruning_stages: 3
+  epochs: 800
+  learning_rate: initial_training_rate
+  require_plateau: true
+expected_final_terms_per_output:
+- 3
+source_final_run: vanderpol_final

@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.venv/
+.env
+case_studies/*/results/
+*.egg-info/
+build/
+dist/

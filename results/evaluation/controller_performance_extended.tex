@@ -1,0 +1,47 @@
+\begin{table}[!t]
+\centering
+\caption{Controller evaluation across case studies.}
+\label{tab:combined-controller-evaluation}
+\scriptsize
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}} l r @{\hspace{5pt}} c r @{\hspace{4pt}} r @{}}
+\toprule
+Method
+& \makecell[c]{Task loss\\$[10^{-3}]$}
+& \makecell[c]{Control\\effort}
+& \makecell[r]{Time $[\mu\mathrm{s}]$\\/\,memory}
+& \makecell[r]{Violations\\$[\%]\,/\,$depth}\\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{\textit{Two-Tank}}}\\
+IPOPT        & $8.8\!\times\!10^{-6}$     & --             & $8444\,/\,26$\,MiB                        & $0.0\,/\,\text{--}$\\
+NN-DPC       & $0.144\pm0.013$            & --             & $30\,/\,5.01$\,kB                         & $0.0\,/\,\text{--}$\\
+SD-DPC       & $\mathbf{0.012\pm0.006}$   & --             & $\mathbf{17\,/\,0.047}$\,\textbf{kB}      & $0.0\,/\,\text{--}$\\
+NN-Distilled & $0.209\pm0.039$            & --             & $17\,/\,0.047$\,kB                        & $0.0\,/\,\text{--}$\\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textbf{\textit{Van der Pol}}}\\
+IPOPT        & $4.6\!\times\!10^{-24}$    & --             & $301\,/\,19$\,MiB                         & $0.0\,/\,\text{--}$\\
+NN-DPC       & $\mathbf{41.0\pm124.4}$    & --             & $29\,/\,5.01$\,kB                         & $0.0\,/\,\text{--}$\\
+SD-DPC       & $49.9\pm126.4$             & --             & $\mathbf{17\,/\,0.023}$\,\textbf{kB}      & $0.0\,/\,\text{--}$\\
+NN-Distilled & $96.8\pm183.8$             & --             & $17\,/\,0.023$\,kB                        & $0.0\,/\,\text{--}$\\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textbf{\textit{2-D Integrator}}}\\
+IPOPT        & $0.000\pm0.000$            & $12.00\pm1.18$ & $1841\,/\,18$\,MiB                        & $0.0\,/\,\text{--}$\\
+NN-DPC       & $\mathbf{0.298\pm0.560}$   & $\mathbf{12.00\pm1.16}$ & $28\,/\,5.01$\,kB                & $0.0\,/\,\text{--}$\\
+SD-DPC       & $4.75\pm4.79$              & $12.07\pm1.12$ & $\mathbf{17\,/\,0.094}$\,\textbf{kB}      & $0.0\,/\,\text{--}$\\
+NN-Distilled & $62.6\pm58.0$              & $12.07\pm1.03$ & $17\,/\,0.094$\,kB                        & $60.8\,/\,1.61$\\
+\bottomrule
+\end{tabular*}
+\par\vspace{3pt}
+\parbox{\columnwidth}{\footnotesize\textit{Notes:} Mean $\pm$ standard
+deviation over 500 held-out test scenarios simulated on the true plant; IPOPT
+losses are numerically zero and given as means. Horizons are 1000, 50, and
+100 steps; task loss is the MSE over the final 100 steps of each 250-step
+reference segment, the final 10 steps, and the terminal state, respectively.
+Control effort is $\sum_t\lVert u_t\rVert_1$. Time is per control step; for
+IPOPT it is the solve time divided by $N$. Memory is the parameter storage for
+the learned policies, and the resident memory added by each solve for IPOPT. Violations give the percentage of scenarios
+with any state-constraint violation and the maximum violation depth, measured
+by $[-h_{\mathrm{obs}}(x_t)]_+$. NN-Distilled uses the terms retained by
+SD-DPC, fitted by unregularized least squares.}
+\end{table}
