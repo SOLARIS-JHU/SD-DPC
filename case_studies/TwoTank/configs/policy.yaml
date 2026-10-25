@@ -69,3 +69,10 @@ nn_training:
   epochs: 1000
   warmup: 100
   patience: 200
+nn_distillation:
+  train_scenarios: 48
+  train_seed: 71001
+  train_horizon: 1000
+  validation_scenarios: 500
+  validation_seed: 20260925
+  validation_horizon: 1000

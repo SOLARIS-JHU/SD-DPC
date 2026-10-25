@@ -144,7 +144,7 @@ python -c "import sdpc, torch, neuromancer; print('SD-DPC installation OK')"
 
 ## Tutorial: rerun a case
 
-All commands below run from the repository root. Choose one of `TwoTank`, `VanDerPol`, or `DoubleIntegrator` and keep the same case name through all four stages.
+All commands below run from the repository root. Choose one of `TwoTank`, `VanDerPol`, or `DoubleIntegrator` and keep the same case name through all five stages.
 
 ```bash
 CASE=TwoTank
@@ -158,7 +158,10 @@ python scripts/$CASE/train_sd_dpc.py
 # 3. Train the NN-DPC comparison policy on the same model and objective.
 python scripts/$CASE/train_nn_dpc.py
 
-# 4. Evaluate the included pretrained checkpoints on the true plant.
+# 4. Distill NN-DPC onto the retained SD-DPC terms and validate it.
+python scripts/$CASE/train_nn_distilled.py
+
+# 5. Evaluate the included pretrained checkpoints on the true plant.
 python scripts/$CASE/evaluation.py
 ```
 
@@ -175,10 +178,11 @@ case_studies/<Case>/results/
 │   ├── policy_sparse_debiased.pt
 │   └── policy_sparse.pt
 ├── models/policies/nn_dpc/run_N/saved_models/policy_nn.pth
+├── models/policies/nn_distilled/run_N/saved_models/policy_nn_distilled.pt
 └── eval/
 ```
 
-The evaluation YAML deliberately points to the included pretrained checkpoints, so the fourth command can be run immediately after installation and remains independent of a new stochastic training run. To evaluate newly trained models, copy the case's evaluation YAML and remove `sindy_path`, `policy_path`, and `nn_policy_path`; checkpoint discovery will then select the latest completed runs.
+The distillation command uses the included NN-DPC teacher and the retained terms of the included SD-DPC policy. It fits only the sparse coefficients by ordinary least squares, evaluates 500 held-out true-plant scenarios, and stops with an error if the displayed task loss, control effort, violation rate, or indexed memory differs from the table. The evaluation YAML points to the included pretrained checkpoints, so the fifth command can be run immediately after installation and remains independent of a new stochastic training run. To evaluate newly trained models, copy the case's evaluation YAML and remove `sindy_path`, `policy_path`, and `nn_policy_path`; checkpoint discovery will then select the latest completed runs.
 
 Debiasing is enabled by default for both sparse stages. To disable it for an experiment, copy the relevant YAML and set:
 
@@ -193,7 +197,7 @@ Pass a custom configuration without changing the included defaults:
 python scripts/TwoTank/train_sd_dpc.py --config /path/to/policy_experiment.yaml
 ```
 
-Every script also accepts `--device` and `--seed`. Use `--help` on any entry point for its options. The notebooks `01_system_id.ipynb` through `04_plot_evaluation_results.ipynb` provide the same case workflow interactively. They load the same case YAML files without shortening the epoch or scenario budgets, execute the configured debias phase, and save resolved config snapshots with their outputs.
+The system identification, SD-DPC, NN-DPC, and evaluation scripts accept `--device` and `--seed`. The distillation script accepts `--device` and an optional `--output-dir`. Use `--help` on any entry point for its options. The notebooks `01_system_id.ipynb` through `04_plot_evaluation_results.ipynb` provide the same case workflow interactively. They load the same case YAML files without shortening the epoch or scenario budgets, execute the configured debias phase, and save resolved config snapshots with their outputs.
 
 For Colab, open `00_colab_workflow.ipynb` in the selected case directory. The streamlined notebook explains the method and case dynamics, then runs system identification, policy learning, and evaluation in one runtime without mounting Google Drive. By default, it loads the pretrained dynamics and policy checkpoints. Each stage starts with its relevant inputs: training switches, nominal rollout conditions, and the evaluation initial state, time-step horizon, scenario count, and controller methods. The 2-D integrator rollout also exposes the obstacle ellipse geometry. Set `TRAIN_SYSTEM_ID` or `TRAIN_POLICY` to `True` to retrain that stage from the case YAML; newly trained models are saved in numbered runs and passed directly to downstream stages. Colab storage is temporary, so download any artifacts that should be retained before ending the runtime.
 
