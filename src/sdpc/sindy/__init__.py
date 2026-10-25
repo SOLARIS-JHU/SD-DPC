@@ -1,9 +1,8 @@
 """Sparse-dictionary building blocks: the candidate library and the SINDy model.
 
 These are the shared representation used for *both* the identified dynamics model
-and the sparse feedback policy (Sec. 3 of the paper). The classes are a faithful copy
-of ``SparseDPC.vectorized.sindy`` so the framework is self-contained; checkpoints saved
-by either package are interchangeable.
+and the sparse feedback policy. The implementation is self-contained and supports
+the checkpoints included with this repository.
 """
 from .library import CompiledFunctionLibrary, LibraryPlan
 from .model import SINDyVectorized

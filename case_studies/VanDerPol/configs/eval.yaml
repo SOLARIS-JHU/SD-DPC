@@ -1,5 +1,5 @@
-# Fixed-controller evaluation with included final checkpoints; inherit their recorded training settings.
-inherit: policy_recorded_run.yaml
+# Fixed-controller evaluation with the included checkpoints.
+inherit: policy.yaml
 seed: 20260925
 n_seeds: 500
 eval_nsteps: 50

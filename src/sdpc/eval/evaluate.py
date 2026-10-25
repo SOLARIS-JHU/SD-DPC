@@ -1,4 +1,4 @@
-"""Evaluation orchestration: compare methods across seeds and save paper-ready tables.
+"""Evaluation orchestration: compare methods across seeds and save result tables.
 
 Compares fixed SD-DPC, NN-DPC, and MPC controllers over configured scenarios,
 then writes per-scenario metrics, summaries, and trajectories.

@@ -1,4 +1,4 @@
-"""Evaluation metrics for the paper's tables (Sec. 5).
+"""Evaluation metrics for controller-comparison tables.
 
 All functions take closed-loop trajectories and return plain floats/ints so results can be
 aggregated across seeds and dumped to CSV/JSON. Definitions:

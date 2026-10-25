@@ -74,7 +74,7 @@ Sequential thresholding removes coefficients with magnitude below $\tau$ or $\ta
 | [Van der Pol](case_studies/VanDerPol) | Stabilization of the one-input, relative-degree-two oscillator | 3 terms |
 | [2-D Integrator](case_studies/DoubleIntegrator) | Setpoint reaching with obstacle avoidance | 8 + 4 terms |
 
-Each case is self-contained under `case_studies/<Case>/`: paper configs are in `configs/`, tutorial notebooks are in `notebooks/`, and the pretrained checkpoints are in `checkpoints/`. The executable entry points are grouped under the matching `scripts/<Case>/` directory.
+Each case is self-contained under `case_studies/<Case>/`: runtime configurations are in `configs/`, tutorial notebooks are in `notebooks/`, and the pretrained checkpoints are in `checkpoints/`. The executable entry points are grouped under the matching `scripts/<Case>/` directory.
 
 
 ## Results
@@ -123,7 +123,7 @@ Task loss is reported as mean $\pm$ standard deviation. Inference time is per co
 
 ## Installation
 
-The paper uses Python 3.10, PyTorch 2.6.0, and Neuromancer 1.5.3. From a fresh checkout:
+The project is tested with Python 3.10, PyTorch 2.6.0, and Neuromancer 1.5.3. From a fresh checkout:
 
 ```bash
 git clone https://github.com/SOLARIS-JHU/SD-DPC.git
@@ -187,24 +187,24 @@ debias:
   enabled: false
 ```
 
-Pass a custom configuration without changing the paper defaults:
+Pass a custom configuration without changing the included defaults:
 
 ```bash
 python scripts/TwoTank/train_sd_dpc.py --config /path/to/policy_experiment.yaml
 ```
 
-Every script also accepts `--device` and `--seed`. Use `--help` on any entry point for its options. The notebooks `01_system_id.ipynb` through `04_plot_evaluation_results.ipynb` provide the same case workflow interactively. They load the same paper-aligned YAML files without shortening the epoch or scenario budgets, execute the configured debias phase, and save resolved config snapshots with their outputs.
+Every script also accepts `--device` and `--seed`. Use `--help` on any entry point for its options. The notebooks `01_system_id.ipynb` through `04_plot_evaluation_results.ipynb` provide the same case workflow interactively. They load the same case YAML files without shortening the epoch or scenario budgets, execute the configured debias phase, and save resolved config snapshots with their outputs.
 
-For Colab, open `00_colab_workflow.ipynb` in the selected case directory. The streamlined notebook explains the method and case dynamics, then runs system identification, policy learning, and evaluation in one runtime without mounting Google Drive. By default, it loads the pretrained dynamics and policy checkpoints. Each stage starts with its relevant inputs: training switches, nominal rollout conditions, and the evaluation initial state, time-step horizon, scenario count, and controller methods. The 2-D integrator rollout also exposes the obstacle ellipse geometry. Set `TRAIN_SYSTEM_ID` or `TRAIN_POLICY` to `True` to retrain that stage from the paper YAML; newly trained models are saved in numbered runs and passed directly to downstream stages. Colab storage is temporary, so download any artifacts that should be retained before ending the runtime.
+For Colab, open `00_colab_workflow.ipynb` in the selected case directory. The streamlined notebook explains the method and case dynamics, then runs system identification, policy learning, and evaluation in one runtime without mounting Google Drive. By default, it loads the pretrained dynamics and policy checkpoints. Each stage starts with its relevant inputs: training switches, nominal rollout conditions, and the evaluation initial state, time-step horizon, scenario count, and controller methods. The 2-D integrator rollout also exposes the obstacle ellipse geometry. Set `TRAIN_SYSTEM_ID` or `TRAIN_POLICY` to `True` to retrain that stage from the case YAML; newly trained models are saved in numbered runs and passed directly to downstream stages. Colab storage is temporary, so download any artifacts that should be retained before ending the runtime.
 
 ## Repository layout
 
 ```text
 assets/          Method diagram in PDF and README-ready PNG
-case_studies/    Three paper cases, each with configs, notebooks, and checkpoints
+case_studies/    Three case studies, each with configs, notebooks, and checkpoints
 scripts/         Matching command-line entry points for every case and stage
 src/sdpc/        Systems, sparse models, training, MPC, metrics, and plotting
-results/         Paper figures, policy-training animation, and evaluation table
+results/         Included figures, policy-training animation, and evaluation table
 ```
 
 ## Citation

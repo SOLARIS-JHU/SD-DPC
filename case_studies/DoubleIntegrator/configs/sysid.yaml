@@ -1,4 +1,4 @@
-# Paper Table I. Stage 1 - SINDy system identification (DoubleIntegrator, discrete A/B plant).
+# SINDy system identification for the discrete 2-D integrator.
 seed: 0
 # --- data ---
 nsim: 1500
@@ -14,9 +14,9 @@ patience: 50
 # --- pruning ---
 threshold: 0.01
 prune_every: 5000
-threshold_mult: 1.05
+threshold_mult: 1.00
 prune_noise: 0.05
-l1_decay: 0.3
+l1_decay: 1.0
 verbosity: 500
 # --- loss weights ---
 weights:

@@ -1,9 +1,0 @@
-# NN-DPC inherits the exact SD-DPC horizon, data, loss, and constraints.
-inherit: policy.yaml
-policy_type: nn
-layers: [32, 32]
-activation: relu
-lr: 0.005
-epochs: 1000
-warmup: 100
-patience: 200

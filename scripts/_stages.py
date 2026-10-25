@@ -17,7 +17,7 @@ if str(REPO_SRC) not in sys.path:
 
 import torch  # noqa: E402
 
-from sdpc.config import load_config, seed_everything  # noqa: E402
+from sdpc.config import deep_update, load_config, seed_everything  # noqa: E402
 from sdpc.eval import evaluate, evaluate_twotank_nominal  # noqa: E402
 from sdpc.io import (  # noqa: E402
     CustomLogger,
@@ -132,10 +132,13 @@ def run_system_id(system_name: str, case_dir: Path) -> None:
 def run_policy_training(system_name: str, case_dir: Path, policy_type: str) -> None:
     if policy_type not in {"sparse", "nn"}:
         raise ValueError("policy_type must be 'sparse' or 'nn'")
-    config_name = "policy.yaml" if policy_type == "sparse" else "policy_nn.yaml"
     label = "SD-DPC" if policy_type == "sparse" else "NN-DPC"
-    _, ctx = _context(system_name, case_dir, config_name, f"{label} policy training")
+    _, ctx = _context(system_name, case_dir, "policy.yaml", f"{label} policy training")
     cfg, system, device = ctx["cfg"], ctx["system"], ctx["device"]
+    if policy_type == "nn":
+        # Both controllers share one policy configuration. NN-specific optimizer
+        # settings override only the named values in the common configuration.
+        cfg = deep_update(cfg, cfg.get("nn_training", {}))
     sindy = _load_sindy(ctx["results_dir"], cfg, device)
 
     if policy_type == "sparse":
@@ -152,7 +155,7 @@ def run_policy_training(system_name: str, case_dir: Path, policy_type: str) -> N
             for coefficients in policy.Xi:
                 coefficients.data.mul_(init_scale)
     else:
-        policy = build_nn_policy(system, cfg).to(device)
+        policy = build_nn_policy(system, cfg.get("nn_policy", cfg)).to(device)
 
     train_loader, dev_loader = system.make_policy_data(cfg, device)
     run_dir = new_policy_run_dir(ctx["results_dir"], policy_type)

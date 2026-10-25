@@ -87,7 +87,7 @@ def load_nn_policy(system, path, cfg: Dict, device=None) -> NeuralPolicy:
         policy.dpc_loss_reference_verified = match
         if match is not True:
             reason = "has no training-config snapshot" if match is None else "uses a different loss/horizon"
-            message = f"NN-DPC checkpoint {path} {reason}; retrain with policy_nn.yaml for strict parity"
+            message = f"NN-DPC checkpoint {path} {reason}; retrain with policy.yaml for strict parity"
             if bool(cfg.get("require_matched_nn_checkpoint", False)):
                 raise ValueError(message)
             warnings.warn(message)

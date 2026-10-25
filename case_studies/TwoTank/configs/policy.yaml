@@ -1,17 +1,17 @@
-# Paper Table I training parameters; saved checkpoints have separate recorded-run configs.
+# Policy training configuration used by the included SD-DPC checkpoint.
+# NN-DPC uses the same data and objective with the overrides under nn_training.
 seed: 0
 policy_seed: 0
 action_scale: 1.0
 action_gradient_mode: leaky_straight_through
-action_gradient_band: 0.1
-action_gradient_leak: 0.05
+action_gradient_band: 0.05
+action_gradient_leak: 0.01
 nsteps: 50
-n_samples: 1000
+n_samples: 2000
 batch_size: 200
 seed_data: 5
 eval_seed: 0
 eval_margin: 0.1
-weight_decay: 0.01
 lr: 0.005
 grad_clip: 5.0
 proximal_l1: false
@@ -44,15 +44,28 @@ logger_metrics:
 - learning_rate
 - unchanged_prune_count
 weights:
-  Q_con: 1.0
+  Q_con: 20.0
   Q_du: 0.0
   Q_dx: 0.0
-  Q_r: 1.0
+  Q_r: 20.0
   Q_u: 0.0
   l1_coef: 0.1
 debias:
   enabled: true
   stable_pruning_stages: 3
-  epochs: 1000
+  epochs: 800
   learning_rate: initial_training_rate
   require_plateau: true
+expected_final_terms_per_output:
+- 4
+- 2
+nn_policy:
+  layers:
+  - 32
+  - 32
+  activation: gelu
+nn_training:
+  lr: 0.005
+  epochs: 1000
+  warmup: 100
+  patience: 200

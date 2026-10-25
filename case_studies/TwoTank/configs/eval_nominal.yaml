@@ -1,4 +1,4 @@
-# Fixed-controller evaluation with included final checkpoints; inherit their recorded training settings.
+# Fixed-controller evaluation with the included checkpoints.
 seed: 11
 n_trajectories: 50
 nsteps: 1000

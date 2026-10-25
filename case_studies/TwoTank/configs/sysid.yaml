@@ -1,4 +1,4 @@
-# Paper Table I. Stage 1 - SINDy system identification (Two-Tank, continuous ODE via RK4).
+# SINDy system identification for the continuous Two-Tank model.
 seed: 0
 nsim: 2000
 nsteps: 5
@@ -10,7 +10,7 @@ warmup: 300
 patience: 50
 threshold: 5.0e-3
 prune_every: 5000
-threshold_mult: 1.09
+threshold_mult: 1.0
 prune_noise: 0.05
 l1_decay: 0.3
 verbosity: 500

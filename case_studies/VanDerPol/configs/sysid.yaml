@@ -1,4 +1,4 @@
-# Paper Table I. Stage 1 - SINDy identification of the conventional one-input Van der Pol system.
+# SINDy system identification for the one-input Van der Pol model.
 seed: 0
 nsim: 2000
 nsteps: 3

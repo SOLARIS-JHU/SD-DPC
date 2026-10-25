@@ -1,6 +1,6 @@
 """SparseDPC framework (``sdpc``): modular, reproducible Sparse Differentiable Predictive Control.
 
-A plug-and-play refactor of the paper's pipeline into reusable stages:
+A plug-and-play sparse-control pipeline organized into reusable stages:
 
 * :mod:`sdpc.systems`    — system interfaces for the active case studies.
 * :mod:`sdpc.sindy`      — the candidate library and SINDy model (dynamics *and* policy).

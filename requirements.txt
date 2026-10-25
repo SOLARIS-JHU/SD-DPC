@@ -1,5 +1,5 @@
 # Direct dependencies used by the SparseDPC framework, scripts, and notebooks.
-# Neuromancer version matches the paper; other versions reflect the tested environment.
+# Dependency versions used by the provided training and evaluation workflows.
 neuromancer==1.5.3
 torch==2.6.0
 numpy==1.26.4
