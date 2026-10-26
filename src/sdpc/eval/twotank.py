@@ -9,7 +9,7 @@ import torch
 
 from ..baselines import solve_mpc
 from .evaluate import aggregate
-from .metrics import compute_metrics, policy_forward_latency
+from .metrics import compute_metrics, policy_forward_latency, task_loss
 from .rollout import rollout_closed_loop
 
 __all__ = [
@@ -219,6 +219,7 @@ def _trajectory_rows(
     spec,
     *,
     method: str,
+    policy=None,
     extra: Optional[Dict[str, float]] = None,
 ) -> List[Dict]:
     rows = []
@@ -227,8 +228,12 @@ def _trajectory_rows(
             result["x_traj"][i : i + 1],
             result["u_traj"][i : i + 1],
             data["r"][i : i + 1],
-            spec=spec,
+            spec=spec, policy=policy,
         )
+        metrics["task_loss"] = task_loss(
+            "twotank", result["x_traj"][i : i + 1], data["r"][i : i + 1]
+        )
+        metrics["task_loss_x1e3"] = 1.0e3 * metrics["task_loss"]
         metrics.update(extra or {})
         for j, value in enumerate(data["xn"][i, 0].detach().cpu().tolist()):
             metrics[f"initial_x{j}"] = float(value)
@@ -313,7 +318,7 @@ def evaluate_twotank_nominal(
             "batched_rollout_wall_time_s": float(result["rollout_time_s"]),
         }
         per_trajectory[name] = _trajectory_rows(
-            result, data, spec, method=name, extra=extra
+            result, data, spec, method=name, policy=policy, extra=extra
         )
         trajectories[name] = {
             "x_traj": result["x_traj"].detach().cpu(),

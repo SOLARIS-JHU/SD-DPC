@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 from ..eval.evaluate import sample_scenario
-from ..eval.metrics import compute_metrics, policy_memory_footprint
+from ..eval.metrics import compute_metrics, policy_memory_footprint, task_loss
 from ..eval.rollout import rollout_closed_loop
 from ..eval.twotank import make_twotank_scenarios
 
@@ -149,26 +149,12 @@ def distill_nn_policy(system, sparse_policy, teacher, scenarios) -> tuple[Distil
     return policy, report
 
 
-def _task_loss(case: str, x: torch.Tensor, reference: torch.Tensor) -> float:
-    horizon = min(x.shape[1], reference.shape[1])
-    if case == "TwoTank":
-        segments = [
-            ((x[:, max(stop - 100, 0):stop] - reference[:, max(stop - 100, 0):stop]) ** 2).mean()
-            for stop in range(250, horizon + 1, 250)
-        ]
-        return float(torch.stack(segments).mean())
-    if case == "VanDerPol":
-        start = max(0, horizon - 10)
-        return float(((x[:, start:horizon] - reference[:, start:horizon]) ** 2).mean())
-    return float(((x[:, horizon - 1] - reference[:, horizon - 1]) ** 2).mean())
-
-
 def evaluate_distilled_policy(case: str, system, policy, scenarios, cfg: Dict) -> Dict:
     """Evaluate one distilled policy with the metrics used in the comparison table."""
     result = _rollout(policy, system, scenarios)
     spec = system.safety_specs(cfg)
     spec.control_rate = None
-    task_loss, effort, violation, max_depth = [], [], [], []
+    task_values, effort, violation, max_depth = [], [], [], []
     for index in range(result["x_traj"].shape[0]):
         x = result["x_traj"][index:index + 1]
         u = result["u_traj"][index:index + 1]
@@ -178,14 +164,14 @@ def evaluate_distilled_policy(case: str, system, policy, scenarios, cfg: Dict) -
             torch.clamp(constraint.delta - 1.0e-7 - constraint.margin(x), min=0.0)
             for constraint in spec.state_constraints
         ]
-        task_loss.append(_task_loss(case, x, reference))
+        task_values.append(task_loss(case, x, reference))
         effort.append(metrics["total_control_action_l1"])
         violation.append(int(metrics["num_state_violations"] > 0))
         max_depth.append(
             float(torch.stack(shortfalls, dim=-1).max()) if shortfalls else 0.0
         )
 
-    task = np.asarray(task_loss, dtype=float)
+    task = np.asarray(task_values, dtype=float)
     control = np.asarray(effort, dtype=float)
     memory = policy_memory_footprint(policy)
     return {

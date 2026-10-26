@@ -20,7 +20,6 @@ def make_debias_config(cfg: Dict) -> Dict:
     result["debias"]["enabled"] = False
     result["epochs"] = epochs
     result["weights"]["l1_coef"] = 0.0
-    result["proximal_l1"] = False
     result["l1_decay"] = 1.0
     result["max_unchange"] = 0
     result["prune_noise"] = 0.0

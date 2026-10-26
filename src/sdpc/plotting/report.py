@@ -94,9 +94,8 @@ def format_metrics_table(summary: Dict[str, Dict[str, float]],
                          metrics: List[str] = None) -> str:
     """Render the aggregated metric summary as a plain-text table (mean +/- std)."""
     metrics = metrics or [
-        "final_tracking_mse", "steps_to_reach", "total_control_action_l1",
-        "control_smoothness_rms", "num_violations", "min_safety_margin",
-        "policy_forward_per_step_ms", "sparsity_total_terms",
+        "task_loss_x1e3", "total_control_action_l1",
+        "policy_forward_per_step_ms", "policy_memory_kib", "sparsity_total_terms",
     ]
     header = ["method"] + metrics
     widths = [max(len(h), 16) for h in header]

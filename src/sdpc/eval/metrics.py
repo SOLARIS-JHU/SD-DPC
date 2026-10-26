@@ -25,6 +25,7 @@ from ..safety.specs import SafetySpec
 
 __all__ = [
     "tracking_mse",
+    "task_loss",
     "terminal_tracking",
     "control_cost",
     "control_smoothness",
@@ -34,6 +35,34 @@ __all__ = [
     "policy_forward_latency",
     "compute_metrics",
 ]
+
+
+def task_loss(case: str, x_traj: torch.Tensor, r_traj: torch.Tensor) -> float:
+    """Return the case-specific closed-loop loss used in the results table.
+
+    Two Tank averages the final 100 samples of each 250-step reference segment,
+    Van der Pol averages the final 10 samples, and the 2-D Integrator uses the
+    terminal-state error. The mean includes every state component.
+    """
+    x, reference = _as_bt(x_traj), _as_bt(r_traj)
+    horizon = min(x.shape[1], reference.shape[1])
+    if horizon < 1:
+        raise ValueError("task loss requires a nonempty trajectory")
+
+    normalized = str(case).lower().replace("-", "").replace("_", "")
+    if normalized == "twotank":
+        stops = list(range(250, horizon + 1, 250)) or [horizon]
+        segments = [
+            ((x[:, max(stop - 100, 0):stop] - reference[:, max(stop - 100, 0):stop]) ** 2).mean()
+            for stop in stops
+        ]
+        return float(torch.stack(segments).mean().item())
+    if normalized == "vanderpol":
+        start = max(0, horizon - 10)
+        return float(((x[:, start:horizon] - reference[:, start:horizon]) ** 2).mean().item())
+    if normalized in {"doubleintegrator", "2dintegrator"}:
+        return float(((x[:, horizon - 1] - reference[:, horizon - 1]) ** 2).mean().item())
+    raise ValueError(f"unknown task-loss case {case!r}")
 
 
 def _as_bt(x: torch.Tensor) -> torch.Tensor:
@@ -334,6 +363,9 @@ def compute_metrics(
         m["success"] = int(m.get("num_violations", 0) == 0)
     if policy is not None:
         m.update(policy_memory_footprint(policy))
+        m["policy_memory_kib"] = m.get(
+            "policy_sparse_indexed_kib_int32", m["policy_tensor_state_kib"]
+        )
     if policy is not None and hasattr(policy, "Xi"):
         m.update(policy_sparsity(policy))
     elif policy is not None and hasattr(policy, "parameters"):

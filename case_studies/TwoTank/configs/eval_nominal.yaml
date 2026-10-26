@@ -1,6 +1,6 @@
 # Fixed-controller evaluation with the included checkpoints.
-seed: 11
-n_trajectories: 50
+seed: 20260925
+n_trajectories: 500
 nsteps: 1000
 n_references: 4
 action_scale: 1.0
@@ -27,6 +27,9 @@ nn_policy:
   - 32
   - 32
   activation: gelu
+methods:
+- sd_dpc
+- nn_dpc
 inference_benchmark:
   warmup: 10
   repeats: 200

@@ -130,10 +130,6 @@ def train_policy(system, dynamics_model, policy, train_loader, dev_loader, cfg, 
             lr_decay_step=cfg.get("lr_decay_step", 50),
             lr_scheduler=cfg.get("lr_decay_enabled", False),
             l1_decay=cfg.get("l1_decay", 0.9),
-            proximal_l1=(
-                cfg["weights"].get("l1_coef", 0.0)
-                if cfg.get("proximal_l1", False) else 0.0
-            ),
             weight_decay=cfg.get("weight_decay", 0.01),
         )
         best = trainer.train()

@@ -324,6 +324,7 @@ def run_evaluation(system_name: str, case_dir: Path) -> None:
             run_dir / "all_trajectories.pt",
         )
         snapshot_config(run_dir, cfg, ctx["seed"])
+        print("\n" + format_metrics_table(output["summary"]))
         print(f"Saved nominal Two Tank evaluation to {run_dir}")
         return
     _, ctx = _context(system_name, case_dir, "eval.yaml", "Controller evaluation")

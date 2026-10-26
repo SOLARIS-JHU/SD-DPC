@@ -53,7 +53,6 @@ class SparseTrainer:
         prune_noise: Small noise added to surviving coefficients after prune
         max_unchange: Stop after this many consecutive prunes leave every output size
             unchanged; zero disables this stopping rule
-        proximal_l1: L1 strength handled by a post-optimizer soft-threshold update
         device: Device for training
     """
 
@@ -90,7 +89,6 @@ class SparseTrainer:
                  threshold_max: float = 1e0,
                  max_unchange: int = 0,
                  l1_decay: float = 1.0,
-                 proximal_l1: float = 0.0,
                  weight_decay: float = 0.01,
                  lr_decay_step: int = 2000,
                  lr_decay_gamma: float = 0.8,):
@@ -109,10 +107,7 @@ class SparseTrainer:
         self.max_unchange = self._validate_max_unchange(max_unchange)
         self.unchanged_prune_count = 0
         self.l1_decay = l1_decay
-        self.proximal_l1 = float(proximal_l1)
         self.weight_decay = float(weight_decay)
-        if self.proximal_l1 < 0.0:
-            raise ValueError("proximal_l1 must be nonnegative")
 
         self.optimizers = optimizers
         self.lr_decay_step = lr_decay_step
@@ -249,29 +244,6 @@ class SparseTrainer:
             )
         return {name: value.detach() for name, value in components.items()}
 
-    def _training_objective(self, reported_loss: torch.Tensor) -> torch.Tensor:
-        """Remove the displayed L1 term when it is handled by a proximal update."""
-        if self.proximal_l1 == 0.0:
-            return reported_loss
-        l1_norm = sum(parameter.abs().sum() for parameter in self.sindy.Xi)
-        return reported_loss - self.proximal_l1 * l1_norm
-
-    @torch.no_grad()
-    def _apply_proximal_l1(self) -> None:
-        """Apply elementwise soft thresholding using each parameter group's LR."""
-        if self.proximal_l1 == 0.0:
-            return
-        learning_rates = {
-            id(parameter): float(group["lr"])
-            for group in self.optimizers.param_groups
-            for parameter in group["params"]
-        }
-        for parameter in self.sindy.Xi:
-            threshold = self.proximal_l1 * learning_rates[id(parameter)]
-            parameter.copy_(
-                parameter.sign() * torch.clamp(parameter.abs() - threshold, min=0.0)
-            )
-
     def train(self) -> dict:
         """
         Full training loop with pruning, early stopping, logging.
@@ -299,10 +271,9 @@ class SparseTrainer:
                             out[self.train_metric] += node.callable.get_alpha_loss()
 
                     self.optimizers.zero_grad()
-                    self._training_objective(out[self.train_metric]).backward()
+                    out[self.train_metric].backward()
                     clip_grad_norm_(self.model.parameters(), self.clip)
                     self.optimizers.step()
-                    self._apply_proximal_l1()
 
                     batch_losses.append(out[self.train_metric].detach())
                     self.callback.end_batch(self, out)
@@ -341,7 +312,6 @@ class SparseTrainer:
                     self.sindy.pretty_print()
                     print("*"*75)
                     self.model.loss.objectives[-1].weight *= self.l1_decay
-                    self.proximal_l1 *= self.l1_decay
                     print("New L1 weight: ", self.model.loss.objectives[-1].weight)
                     print("New pruning threshold: ", self.threshold)
                     if self.max_unchange > 0:

@@ -76,6 +76,40 @@ Sequential thresholding removes coefficients with magnitude below $\tau$ or $\ta
 
 Each case is self-contained under `case_studies/<Case>/`: runtime configurations are in `configs/`, tutorial notebooks are in `notebooks/`, and the pretrained checkpoints are in `checkpoints/`. The executable entry points are grouped under the matching `scripts/<Case>/` directory.
 
+### Policy training configurations
+
+The policy training configurations use the following settings. The case names link to the complete YAML files, which also specify the data domains, optimizer schedule, action projection, NN-DPC settings, and distillation settings.
+
+| Parameter | [Two Tank](case_studies/TwoTank/configs/policy.yaml) | [Van der Pol](case_studies/VanDerPol/configs/policy.yaml) | [2-D Integrator](case_studies/DoubleIntegrator/configs/policy.yaml) |
+| --- | ---: | ---: | ---: |
+| Random seed / policy seed | 0 / 0 | 0 / 6 | 0 / 5 |
+| Training scenarios | 2,000 | 1,000 | 2,000 |
+| Rollout horizon | 50 | 50 | 100 |
+| Batch size | 200 | 200 | 200 |
+| Maximum training epochs | 12,000 | 12,000 | 12,000 |
+| Learning rate | $5\times10^{-3}$ | $1.5\times10^{-3}$ | $5\times10^{-4}$ |
+| Gradient clipping | 5 | 10 | 1 |
+| Action gradient band | 0.05 | 0.05 | 0.01 |
+| Action gradient leak | 0.01 | 0.01 | 0.05 |
+| $\ell_1$ weight $\lambda_\pi$ | 0.1 | 0.001 | 0.016 |
+| Pruning threshold $\tau_\pi$ | 0.2 | 0.0625 | 0.004 |
+| Pruning interval | 800 epochs | 800 epochs | 800 epochs |
+| Stable pruning stages | 3 | 3 | 3 |
+| Debias epochs | 800 | 800 | 800 |
+| Retained terms per control output | 4 + 2 | 3 | 8 + 4 |
+
+The closed-loop objective weights are:
+
+| Weight | Two Tank | Van der Pol | 2-D Integrator |
+| --- | ---: | ---: | ---: |
+| Tracking, $Q_r$ | 20 | 20 | 1 |
+| Control magnitude, $Q_u$ | 0 | 5 | 10 |
+| Terminal control, $Q_{u_f}$ | — | — | 5 |
+| State increments, $Q_{\Delta x}$ | 0 | 0 | 1 |
+| Control increments, $Q_{\Delta u}$ | 0 | 1 | 10 |
+| State/input constraints | $Q_{\mathrm{con}}=20$ | $Q_{\mathrm{con}}=20$ | $Q_{\mathrm{con},x}=Q_{\mathrm{con},u}=1$ |
+| Obstacle constraint, $Q_{\mathrm{obs}}$ | — | — | 100 |
+
 
 ## Results
 
@@ -116,10 +150,10 @@ Closed-loop evaluation compares SD-DPC with NN-DPC, a sparse policy distilled fr
 |  | NN-Distilled | $96.8\pm183.8$ | — | 17 µs / 0.023 kB | 0.0 / — |
 | 2-D Integrator | IPOPT | $0.000\pm0.000$ | $12.00\pm1.18$ | 1841 µs / 18 MiB | 0.0 / — |
 |  | NN-DPC | **$0.298\pm0.560$** | **$12.00\pm1.16$** | 28 µs / 5.01 kB | 0.0 / — |
-|  | **SD-DPC** | $4.75\pm4.79$ | $12.07\pm1.12$ | **17 µs / 0.094 kB** | 0.0 / — |
+|  | **SD-DPC** | $4.75\pm4.79$ | $12.07\pm1.12$ | **17 µs / 0.094 kB** | 0.2 / 0.01 |
 |  | NN-Distilled | $62.6\pm58.0$ | $12.07\pm1.03$ | 17 µs / 0.094 kB | 60.8 / 1.61 |
 
-Task loss is reported as mean $\pm$ standard deviation. Inference time is per control step. Memory is learned-policy parameter storage; IPOPT reports additional resident memory per solve. The source table and full metric definitions are in [`controller_performance_extended.tex`](results/evaluation/controller_performance_extended.tex).
+Task loss is reported as mean $\pm$ standard deviation. Computation time is measured per control step using the compiled implementations rather than eager execution. Memory is learned-policy parameter storage; IPOPT reports additional resident memory per solve. The source table and full metric definitions are in [`controller_performance_extended.tex`](results/evaluation/controller_performance_extended.tex).
 
 ## Installation
 
@@ -142,9 +176,33 @@ Verify the installation:
 python -c "import sdpc, torch, neuromancer; print('SD-DPC installation OK')"
 ```
 
-## Tutorial: rerun a case
+### Reproducibility
 
-All commands below run from the repository root. Choose one of `TwoTank`, `VanDerPol`, or `DoubleIntegrator` and keep the same case name through all five stages.
+The default evaluation commands load the included checkpoints and use the fixed seeds,
+scenario counts, and horizons in the case configuration files. They reproduce the task
+loss, control effort, policy size, and retained terms in the results table to the shown
+precision. Inference time depends on the processor and compiler available on the machine.
+
+Training is deterministic on the documented CPU environment and is expected to recover
+the same sparse supports and results at the shown precision. Floating-point coefficients
+can differ slightly across operating systems, PyTorch versions, and CPU or GPU backends;
+the serialized checkpoint files are therefore the canonical exact policies.
+
+## Reproduce the reported controller results
+
+The following commands use the included checkpoints and fixed 500-scenario evaluation
+sets. The first evaluates SD-DPC and NN-DPC. The second reconstructs NN-Distilled from
+the included policies and verifies its displayed task, effort, safety, and memory values.
+
+```bash
+CASE=TwoTank
+python scripts/$CASE/evaluation.py
+python scripts/$CASE/train_nn_distilled.py
+```
+
+## Tutorial: retrain a case
+
+All commands below run from the repository root. Choose one of `TwoTank`, `VanDerPol`, or `DoubleIntegrator` and keep the same case name through every stage.
 
 ```bash
 CASE=TwoTank
@@ -157,12 +215,6 @@ python scripts/$CASE/train_sd_dpc.py
 
 # 3. Train the NN-DPC comparison policy on the same model and objective.
 python scripts/$CASE/train_nn_dpc.py
-
-# 4. Distill NN-DPC onto the retained SD-DPC terms and validate it.
-python scripts/$CASE/train_nn_distilled.py
-
-# 5. Evaluate the included pretrained checkpoints on the true plant.
-python scripts/$CASE/evaluation.py
 ```
 
 Training outputs are written without overwriting previous runs:
@@ -182,7 +234,7 @@ case_studies/<Case>/results/
 └── eval/
 ```
 
-The distillation command uses the included NN-DPC teacher and the retained terms of the included SD-DPC policy. It fits only the sparse coefficients by ordinary least squares, evaluates 500 held-out true-plant scenarios, and stops with an error if the displayed task loss, control effort, violation rate, or indexed memory differs from the table. The evaluation YAML points to the included pretrained checkpoints, so the fifth command can be run immediately after installation and remains independent of a new stochastic training run. To evaluate newly trained models, copy the case's evaluation YAML and remove `sindy_path`, `policy_path`, and `nn_policy_path`; checkpoint discovery will then select the latest completed runs.
+The distillation command uses the included NN-DPC teacher and the retained terms of the included SD-DPC policy. It fits only the sparse coefficients by ordinary least squares, evaluates 500 held-out true-plant scenarios, and stops with an error if the displayed task loss, control effort, violation rate, or indexed memory differs from the table. The evaluation YAML points to the included pretrained checkpoints, so the reproduction commands can run immediately after installation and remain independent of a new training run. To evaluate newly trained models, copy the case's evaluation YAML and remove `sindy_path`, `policy_path`, and `nn_policy_path`; checkpoint discovery will then select the latest completed runs.
 
 Debiasing is enabled by default for both sparse stages. To disable it for an experiment, copy the relevant YAML and set:
 

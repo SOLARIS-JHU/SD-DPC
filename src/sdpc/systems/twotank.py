@@ -77,7 +77,8 @@ class TwoTankSystem(System):
             nsteps=cfg.get("nsteps", 50), n_samples=cfg.get("n_samples", 2000),
             nx=self.nx, xmin=self.xmin, xmax=self.xmax, zero_refs=False,
             same_ref_for_all_states=True, device=device,
-            batch_size=cfg.get("batch_size", 200), seed=cfg.get("seed", 5),
+            batch_size=cfg.get("batch_size", 200),
+            seed=cfg.get("seed_data", cfg.get("seed", 5)),
         )
 
     # ---- DPC loss ------------------------------------------------------- #

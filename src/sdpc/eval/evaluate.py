@@ -17,7 +17,7 @@ import torch
 from ..baselines import solve_mpc
 from ..data.reference import build_reference
 from ..io.run import save_json
-from .metrics import compute_metrics, policy_forward_latency
+from .metrics import compute_metrics, policy_forward_latency, task_loss
 from .rollout import rollout_closed_loop
 
 __all__ = [
@@ -259,6 +259,10 @@ def evaluate(
                 reach_tolerance=float(cfg.get("reach_tolerance", 0.05)),
                 reach_hold_steps=int(cfg.get("reach_hold_steps", 5)),
             )
+            metrics["task_loss"] = task_loss(
+                system.name, res["x_traj"], res["r_traj"]
+            )
+            metrics["task_loss_x1e3"] = 1.0e3 * metrics["task_loss"]
             inference_cfg = cfg.get("inference_benchmark", {})
             if res.get("policy") is not None:
                 if name in {"sd_dpc", "nn_dpc", "nominal", "mismatch"}:

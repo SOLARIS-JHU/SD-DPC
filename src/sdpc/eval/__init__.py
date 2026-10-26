@@ -4,6 +4,7 @@ from .metrics import (
     control_smoothness,
     policy_forward_latency,
     policy_memory_footprint,
+    task_loss,
 )
 from .rollout import rollout_closed_loop, make_test_data
 from .evaluate import evaluate, default_methods, dpc_loss_reference, sample_scenario, aggregate
@@ -18,6 +19,7 @@ __all__ = [
     "control_smoothness",
     "policy_forward_latency",
     "policy_memory_footprint",
+    "task_loss",
     "rollout_closed_loop",
     "make_test_data",
     "evaluate",

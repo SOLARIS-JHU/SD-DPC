@@ -1,4 +1,4 @@
-# Policy training configuration used by the included SD-DPC checkpoint.
+# Sparse policy training configuration.
 # NN-DPC uses the same data and objective with the overrides under nn_training.
 seed: 0
 policy_seed: 0
@@ -9,12 +9,11 @@ action_gradient_leak: 0.01
 nsteps: 50
 n_samples: 2000
 batch_size: 200
-seed_data: 5
+seed_data: 0
 eval_seed: 0
 eval_margin: 0.1
 lr: 0.005
 grad_clip: 5.0
-proximal_l1: false
 epochs: 12000
 threshold: 0.2
 prune_every: 800
